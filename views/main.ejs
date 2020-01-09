@@ -1,0 +1,308 @@
+<%- contentFor('body') %>
+<style>
+    .selectZoon{
+        width: 100%;
+    }
+    .selectBox{
+        width: 100%;
+        height: 50px;
+        font-size: 25px;
+        font-weight: 500;
+    }
+    .dataPushButton{
+        height: 110px;
+        font-size: 30px;
+        cursor: pointer;
+    }
+    #clickData{
+        text-align: center;
+    }
+    #confirm{
+        display: none;
+    }
+    #partPumpZoon{
+        display: none;
+    }
+    #actionID{
+        display: none;
+    }
+    #partColor{
+        display: none;
+    }
+</style>
+<script>
+    pumpData = ["on", "off"]
+    
+    window.onload = function () {
+        arrayData = []
+        addId = []
+        let uId =["all", "0x01", "0x02", "0x03", "0x04", "0x05", "0x06", "0x07", "0x08", "0x09"]
+        let action =[0,1,2,3,4,5,6,7,8,9]
+        let part =["tema", "color"]
+        let type =["alarm", "pump", "control"]
+        let acrionAllData = ["1","2","3"]    
+        const selectUid = document.getElementById('selectUid');
+        const selectAction = document.getElementById('selectAction');
+        const selectPart = document.getElementById('selectPart');
+        const selectType = document.getElementById('type');
+        const selectActionAll = document.getElementById('selectActionAll');
+        const selectPartPump = document.getElementById('selectPartPump');
+
+        for(var i = 0; i<uId.length; i++){
+            const option = document.createElement("option");
+            option.text = uId[i]
+            option.value = uId[i]
+            selectUid.appendChild(option);
+        }
+        for(var i = 0; i<action.length; i++){
+            const option = document.createElement("option");
+            option.text = action[i]
+            option.value = action[i]
+            selectAction.appendChild(option);
+        }
+        for(var i = 0; i<part.length; i++){
+            const option = document.createElement("option");
+            option.text = part[i]
+            option.value = part[i]
+            selectPart.appendChild(option);
+        }
+        for(var i = 0; i<type.length; i++){
+            const option = document.createElement("option");
+            option.text = type[i]
+            option.value = type[i]
+            selectType.appendChild(option);
+        }
+
+        for(var i = 0; i<acrionAllData.length; i++){
+            const option = document.createElement("option");
+            option.text = acrionAllData[i]
+            option.value = acrionAllData[i]
+            selectActionAll.appendChild(option);
+        }
+        for(var i = 0; i<pumpData.length; i++){
+            const option = document.createElement("option");
+            option.text = pumpData[i]
+            option.value = pumpData[i]
+            selectPartPump.appendChild(option);
+        }
+
+    }
+    const clickSendData = () => {
+        const confirmArray = []
+        confirmArray.push(arrayData)
+        
+        
+        let lengthNum = confirmArray[0].length
+        
+        if(lengthNum <= 1){ // 아무것도 추가 하지 않았을 때
+            const headerData = document.getElementById('type').value;
+            const uId = document.getElementById('selectUid').value;
+            const selectAction = document.getElementById('selectAction').value;
+            const timestart = document.getElementById('timestart').value;
+            const timestop = document.getElementById('timestop').value;
+            if (headerData == "pump") {
+                const selectPartPump = document.getElementById('selectPartPump').value;
+                
+                let dataInfo = {"header":headerData, "uid":uId, "sub": {"action": selectAction, "part": selectPartPump}, "timealarm": {"timestart": timestart, "timestop": timestop}, "continue": ""}
+                
+
+                axios.post("/dataInfo", dataInfo)
+                    .then(res => {
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    })
+            } else {
+                if(uId == "all"){
+                    const selectPart = document.getElementById('selectPart').value;
+                    let dataInfo = {"header":headerData, "uid":uId, "sub": {"action": selectAction, "part": selectPart}, "timealarm": {"timestart": timestart, "timestop": timestop}, "continue": ""}
+                    
+
+                    axios.post("/dataInfo", dataInfo)
+                        .then(res => {
+                        })
+                        .catch(err => {
+                            console.log(err);
+                        })
+                } else {
+                    const selectColor = document.getElementById('selectColor').value;
+                    let dataInfo = {"header":headerData, "uid":uId, "sub": {"action": selectAction, "part": selectColor}, "timealarm": {"timestart": timestart, "timestop": timestop}, "continue": ""}
+                    
+
+                    axios.post("/dataInfo", dataInfo)
+                        .then(res => {
+                        })
+                        .catch(err => {
+                            console.log(err);
+                        })
+                }
+                
+            }
+            
+            
+        } else { // 추가를 했을 때
+            axios.post("/dataInfo", confirmArray[0])
+                    .then(res => {
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    })
+        }
+        
+        
+        
+    }
+    const clickAdd = () => {
+        const headerData = document.getElementById('type').value;
+        const uId = document.getElementById('selectUid').value;
+        const selectAction = document.getElementById('selectAction').value;
+        const timestart = document.getElementById('timestart').value;
+        const timestop = document.getElementById('timestop').value;
+        if (headerData == "pump") {
+            const selectPartPump = document.getElementById('selectPartPump').value;
+            
+            let dataInfo = {"header":headerData, "uid":uId, "sub": {"action": selectAction, "part": selectPartPump}, "timealarm": {"timestart": timestart, "timestop": timestop}, "continue": ""}
+            addId.push(uId)
+            arrayData.push(dataInfo)
+        } else {
+            const selectPart = document.getElementById('selectPart').value;
+            let dataInfo = {"header":headerData, "uid":uId, "sub": {"action": selectAction, "part": selectPart}, "timealarm": {"timestart": timestart, "timestop": timestop}, "continue": ""}
+            addId.push(uId)
+            arrayData.push(dataInfo)
+        }
+    }
+
+    const clickConfirm = () => {
+        const confirmArray = []
+        confirmArray.push(addId)
+        
+        if(confirmArray.length > 0){
+            const el = document.getElementById("confirm");
+
+            el.style.display = "block"
+
+            for(var i = 0; i < confirmArray.length; i++){
+                var para = document.createElement("P");
+                para.innerText = confirmArray[i]
+                para.class = "confirmData"
+                el.appendChild(para);
+            }
+        } else {
+            const el = document.getElementById("confirm");
+            el.style.display = "none"
+        }
+    }
+    const typeChange = () => {
+        let headerData = document.getElementById('type').value;
+
+        
+        const partControlZoon = document.getElementById('partControlZoon');
+        const partPumpZoon = document.getElementById('partPumpZoon');
+        const partColor = document.getElementById('partColor');
+        
+        if(headerData == "pump"){
+            
+            partPumpZoon.style.display = "block"
+            partControlZoon.style.display = "none"
+            partColor.style.display = "none"
+
+        } else if(headerData == "control") {
+            partPumpZoon.style.display = "none"
+            partControlZoon.style.display = "block"
+        }
+    }
+
+    const uidChange = () => {
+        let selectUid = document.getElementById('selectUid').value;
+        let headerData = document.getElementById('type').value;
+
+        const actionAll = document.getElementById('actionAll');
+        const actionID = document.getElementById('actionID');
+        const partColor = document.getElementById('partColor');
+        const partControlZoon = document.getElementById('partControlZoon');
+        const partPumpZoon = document.getElementById('partPumpZoon');
+
+        if(headerData == "control") {
+            if(selectUid == "all") {
+           
+                actionAll.style.display = "block"
+                partControlZoon.style.display = "block"
+                actionID.style.display = "none"
+                partColor.style.display = "none"
+                
+            } else {
+                actionID.style.display = "block"
+                actionAll.style.display = "none"
+                partColor.style.display = "block"
+                partControlZoon.style.display = "none"
+                
+            }
+        } else if(headerData == "pump") {
+            if(selectUid == "all") {
+           
+                partPumpZoon.style.display = "block"
+           
+            } else {
+                partPumpZoon.style.display = "block"
+                
+            }
+        }
+        
+
+    }
+</script>
+
+<div>
+    <div>
+        <div class="selectZoon">
+            <h1>Type Of Control </h1>
+            <select id = "type" class="selectBox" onChange="typeChange()"> </select>
+        </div >
+        <div class="selectZoon">
+            <h1>uID</h1>
+            <select id = "selectUid" class="selectBox" onChange="uidChange()"> </select>
+        </div>
+        <!-- pump일때 select -->
+        <div class="selectZoon" id = "partPumpZoon">
+            <h1>Part</h1>
+            <select id = "selectPartPump" class="selectBox" > </select>
+        </div>
+        <!-- control일때 select -->
+        <div class="selectZoon" id ="partControlZoon">
+            <h1>Part</h1>
+            <select id = "selectPart" class="selectBox"> </select>
+        </div>
+        <!-- uID가 일반 일 때 -->
+        <div class="selectZoon" id ="partColor">
+            <h1>Part</h1>
+            <select id = "selectColor" class="selectBox"> 
+                <option value="color">color</option>
+            </select>
+        </div>
+        <!-- uID가 all일 때 -->
+        <div class="selectZoon" id="actionAll">
+            <h1>Action</h1>
+            <select id = "selectActionAll" class="selectBox"> </select>
+        </div>
+        <!-- uID가 기본 id값일때 -->
+        <div class="selectZoon" id="actionID">
+            <h1>Action</h1>
+            <select id = "selectAction" class="selectBox"> </select>
+        </div>
+        
+        <div class="selectZoon">
+            <h1>시작 시간 : <input type="text" id="timestart" class="selectBox"></h1>
+            <h1>끝나는 시간 : <input type="text" id="timestop" class="selectBox"></h1>
+        </div>
+        <div id="confirm">
+            
+        </div>
+        <div id="clickData">
+            <button onClick=clickAdd() class="dataPushButton">추가</button>
+            <button onClick=clickSendData() class="dataPushButton">보내기</button>
+            <button onClick=clickConfirm() class="dataPushButton">확인</button>
+        </div>
+
+    </div>
+</div>
+
