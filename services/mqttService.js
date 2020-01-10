@@ -2,10 +2,7 @@ const mqtt = require('mqtt');
 const mysql = require('mysql');
 const config = require('../config');
 
-const client = mqtt.connect('mqtt://1.234.51.99:5556', {
-    // username: 'fsrnt',
-    // password: '75657565'
-});
+
 
 client.subscribe('/topic/aqua');
 
