@@ -1,14 +1,7 @@
 <%- contentFor('body') %>
 <style>
-    .selectZoon{
-        width: 100%;
-    }
-    .selectBox{
-        width: 100%;
-        height: 50px;
-        font-size: 25px;
-        font-weight: 500;
-    }
+    .selectZoon{ width: 100%; }
+    .selectBox{ width: 100%; height: 50px; font-size: 25px; font-weight: 500; }
     .dataPushButton{
         height: 110px;
         font-size: 30px;
@@ -29,6 +22,9 @@
     #partColor{
         display: none;
     }
+    #pumpAction{
+        display: none;
+    }
 </style>
 <script>
     pumpData = ["on", "off"]
@@ -36,18 +32,20 @@
     window.onload = function () {
         arrayData = []
         addId = []
-        let uId =["all", "0x01", "0x02", "0x03", "0x04", "0x05", "0x06", "0x07", "0x08", "0x09"]
-        let action =[0,1,2,3,4,5,6,7,8,9]
-        let part =["tema", "color"]
-        let type =["alarm", "pump", "control"]
-        let acrionAllData = ["1","2","3"]    
+        const uId =["all", "0x01", "0x02", "0x03", "0x04", "0x05", "0x06", "0x07", "0x08", "0x09"]
+        const action =[0,1,2,3,4,5,6,7,8,9]
+        const part =["tema", "color"]
+        const type =["alarm", "pump", "control"]
+        const acrionAllData = ["1","2","3"]   
+        const pumpActionData =  ["1","2","3","4","5"]   
         const selectUid = document.getElementById('selectUid');
         const selectAction = document.getElementById('selectAction');
         const selectPart = document.getElementById('selectPart');
         const selectType = document.getElementById('type');
         const selectActionAll = document.getElementById('selectActionAll');
         const selectPartPump = document.getElementById('selectPartPump');
-
+        const selectPumpAction = document.getElementById('selectPumpAction');
+        
         for(var i = 0; i<uId.length; i++){
             const option = document.createElement("option");
             option.text = uId[i]
@@ -85,7 +83,13 @@
             option.value = pumpData[i]
             selectPartPump.appendChild(option);
         }
-
+        for(var i = 0; i<pumpActionData.length; i++){
+            const option = document.createElement("option");
+            option.text = pumpActionData[i]
+            option.value = pumpActionData[i]
+            selectPumpAction.appendChild(option);
+        }
+        
     }
     const clickSendData = () => {
         const confirmArray = []
@@ -102,8 +106,8 @@
             const timestop = document.getElementById('timestop').value;
             if (headerData == "pump") {
                 const selectPartPump = document.getElementById('selectPartPump').value;
-                
-                let dataInfo = {"header":headerData, "uid":uId, "sub": {"action": selectAction, "part": selectPartPump}, "timealarm": {"timestart": timestart, "timestop": timestop}, "continue": ""}
+                const selectPumpAction = document.getElementById('selectPumpAction').value;
+                let dataInfo = {"header":headerData, "uid":uId, "sub": {"action": selectPumpAction, "part": selectPartPump}, "timealarm": {"timestart": timestart, "timestop": timestop}, "continue": ""}
                 
 
                 axios.post("/dataInfo", dataInfo)
@@ -112,7 +116,7 @@
                     .catch(err => {
                         console.log(err);
                     })
-            } else {
+            } else { /* 컨트럴 일때*/
                 if(uId == "all"){
                     const selectPart = document.getElementById('selectPart').value;
                     let dataInfo = {"header":headerData, "uid":uId, "sub": {"action": selectAction, "part": selectPart}, "timealarm": {"timestart": timestart, "timestop": timestop}, "continue": ""}
@@ -126,15 +130,16 @@
                         })
                 } else {
                     const selectColor = document.getElementById('selectColor').value;
+                                    
                     let dataInfo = {"header":headerData, "uid":uId, "sub": {"action": selectAction, "part": selectColor}, "timealarm": {"timestart": timestart, "timestop": timestop}, "continue": ""}
                     
 
-                    axios.post("/dataInfo", dataInfo)
-                        .then(res => {
-                        })
-                        .catch(err => {
-                            console.log(err);
-                        })
+                    // axios.post("/dataInfo", dataInfo)
+                    //     .then(res => {
+                    //     })
+                    //     .catch(err => {
+                    //         console.log(err);
+                    //     })
                 }
                 
             }
@@ -155,20 +160,34 @@
     const clickAdd = () => {
         const headerData = document.getElementById('type').value;
         const uId = document.getElementById('selectUid').value;
-        const selectAction = document.getElementById('selectAction').value;
         const timestart = document.getElementById('timestart').value;
         const timestop = document.getElementById('timestop').value;
         if (headerData == "pump") {
             const selectPartPump = document.getElementById('selectPartPump').value;
-            
-            let dataInfo = {"header":headerData, "uid":uId, "sub": {"action": selectAction, "part": selectPartPump}, "timealarm": {"timestart": timestart, "timestop": timestop}, "continue": ""}
+            const selectPumpAction = document.getElementById('selectPumpAction').value;
+            let dataInfo = {"header":headerData, "uid":uId, "sub": {"action": selectPumpAction, "part": selectPartPump}, "timealarm": {"timestart": timestart, "timestop": timestop}, "continue": ""}
             addId.push(uId)
             arrayData.push(dataInfo)
         } else {
-            const selectPart = document.getElementById('selectPart').value;
-            let dataInfo = {"header":headerData, "uid":uId, "sub": {"action": selectAction, "part": selectPart}, "timealarm": {"timestart": timestart, "timestop": timestop}, "continue": ""}
-            addId.push(uId)
-            arrayData.push(dataInfo)
+            if(uId == "all"){
+                if(selectPart == "tema"){
+                    const selectActionAll = document.getElementById('selectActionAll').value;
+                    let dataInfo = {"header":headerData, "uid":uId, "sub": {"action": selectActionAll, "part": selectPart}, "timealarm": {"timestart": timestart, "timestop": timestop}, "continue": ""}
+                    addId.push(uId)
+                    arrayData.push(dataInfo)
+                } else {
+                    const selectAction = document.getElementById('selectAction').value;
+                    let dataInfo = {"header":headerData, "uid":uId, "sub": {"action": selectAction, "part": selectPart}, "timealarm": {"timestart": timestart, "timestop": timestop}, "continue": ""}
+                    addId.push(uId)
+                    arrayData.push(dataInfo)
+                }
+            } else {
+                const selectColor = document.getElementById('selectColor').value;
+                const selectAction = document.getElementById('selectAction').value;
+                let dataInfo = {"header":headerData, "uid":uId, "sub": {"action": selectAction, "part": selectColor}, "timealarm": {"timestart": timestart, "timestop": timestop}, "continue": ""}
+                addId.push(uId)
+                arrayData.push(dataInfo)
+            }
         }
     }
 
@@ -194,18 +213,20 @@
     }
     const typeChange = () => {
         let headerData = document.getElementById('type').value;
-
-        
+        const pumpAction = document.getElementById('pumpAction');
+        const actionID = document.getElementById('actionID');
         const partControlZoon = document.getElementById('partControlZoon');
         const partPumpZoon = document.getElementById('partPumpZoon');
         const partColor = document.getElementById('partColor');
-        
+        const actionAll = document.getElementById('actionAll');
         if(headerData == "pump"){
-            
+            actionAll.style.display = "none"
             partPumpZoon.style.display = "block"
             partControlZoon.style.display = "none"
             partColor.style.display = "none"
-
+            actionID.style.display = "none"
+            pumpAction.style.display = "block"
+            
         } else if(headerData == "control") {
             partPumpZoon.style.display = "none"
             partControlZoon.style.display = "block"
@@ -215,12 +236,14 @@
     const uidChange = () => {
         let selectUid = document.getElementById('selectUid').value;
         let headerData = document.getElementById('type').value;
+        let selectPart = document.getElementById('selectPart').value;
 
         const actionAll = document.getElementById('actionAll');
         const actionID = document.getElementById('actionID');
         const partColor = document.getElementById('partColor');
         const partControlZoon = document.getElementById('partControlZoon');
         const partPumpZoon = document.getElementById('partPumpZoon');
+        const pumpAction = document.getElementById('pumpAction');
 
         if(headerData == "control") {
             if(selectUid == "all") {
@@ -229,13 +252,14 @@
                 partControlZoon.style.display = "block"
                 actionID.style.display = "none"
                 partColor.style.display = "none"
+                pumpAction.style.display = "none"
                 
             } else {
                 actionID.style.display = "block"
                 actionAll.style.display = "none"
                 partColor.style.display = "block"
                 partControlZoon.style.display = "none"
-                
+                pumpAction.style.display = "none"
             }
         } else if(headerData == "pump") {
             if(selectUid == "all") {
@@ -249,6 +273,18 @@
         }
         
 
+    }
+    const partChange = () => {
+        let selectPart = document.getElementById('selectPart').value;
+        const actionAll = document.getElementById('actionAll');
+        const actionID = document.getElementById('actionID');
+        if(selectPart == "color"){
+            actionID.style.display = "block"
+            actionAll.style.display = "none"
+        } else {
+            actionID.style.display = "none"
+            actionAll.style.display = "block"
+        }
     }
 </script>
 
@@ -270,7 +306,7 @@
         <!-- control일때 select -->
         <div class="selectZoon" id ="partControlZoon">
             <h1>Part</h1>
-            <select id = "selectPart" class="selectBox"> </select>
+            <select id = "selectPart" class="selectBox" onChange="partChange()"> </select>
         </div>
         <!-- uID가 일반 일 때 -->
         <div class="selectZoon" id ="partColor">
@@ -289,7 +325,11 @@
             <h1>Action</h1>
             <select id = "selectAction" class="selectBox"> </select>
         </div>
-        
+         <!-- pump일때 acrion -->
+         <div class="selectZoon" id="pumpAction">
+            <h1>Action</h1>
+            <select id = "selectPumpAction" class="selectBox"> </select>
+        </div> 
         <div class="selectZoon">
             <h1>시작 시간 : <input type="text" id="timestart" class="selectBox"></h1>
             <h1>끝나는 시간 : <input type="text" id="timestop" class="selectBox"></h1>
